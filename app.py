@@ -46,7 +46,7 @@ async def listen(websocket, path):
             if event == "key_press_1":
                 keyboard_controller.press(config['key_1'])
             if event == "key_press_2":
-                keyboard_controller.press(config['key_2'])x
+                keyboard_controller.press(config['key_2'])
             if event == "key_release_1":
                 keyboard_controller.release(config['key_1'])
             if event == "key_release_2":
