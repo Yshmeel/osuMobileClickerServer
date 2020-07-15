@@ -5,7 +5,7 @@ import socket
 from pynput.keyboard import Controller 
 import asyncio
 import websockets
-import json
+import json, time
 
 """
     osu! mobile clicker
@@ -30,12 +30,11 @@ if args.ip != None:
 
 if args.port != None:
     listen_port = args.port
-
 connected = []
 
 async def listen(websocket, path):
     ip = websocket.remote_address[0]
-
+    
     if ip not in connected:
         connected.append(ip)
         print(f"- A new client connected. IP: {ip}")
@@ -44,11 +43,10 @@ async def listen(websocket, path):
         async for message in websocket:
             message_object = json.loads(message)
             event = message_object['event']
-
             if event == "key_press_1":
                 keyboard_controller.press(config['key_1'])
             if event == "key_press_2":
-                keyboard_controller.press(config['key_2'])
+                keyboard_controller.press(config['key_2'])x
             if event == "key_release_1":
                 keyboard_controller.release(config['key_1'])
             if event == "key_release_2":
@@ -56,14 +54,15 @@ async def listen(websocket, path):
     except OSError:
         raise
     finally:
-        connected.remove(ip)
+        if ip in connected:
+            connected.remove(ip)
         print(f"- Client disconnected. IP: {ip}")
 
 
 print("osu! mobile clicker")
 
 try:
-    start_server = websockets.serve(listen, listen_ip, listen_port)
+    start_server = websockets.serve(listen, listen_ip, listen_port, max_queue=999, read_limit=999, write_limit=999, ping_interval=1)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     print("- Listening at " + "{ip}:{port}".format(ip=listen_ip, port=listen_port))
