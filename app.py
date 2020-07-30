@@ -16,7 +16,6 @@ import json, time
 keyboard_controller = Controller() 
 
 # https://stackoverflow.com/a/1267524
-listen_ip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
 listen_port = 3125
 
 parser = argparse.ArgumentParser(description='Setting up socket-server')
@@ -24,12 +23,13 @@ parser.add_argument("--ip", type=str, help="ip to listen")
 parser.add_argument("--port", type=str, help="port to listen")
 
 args = parser.parse_args()
-
 if args.ip != None:
     listen_ip = args.ip
-
+else:
+	listen_ip = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
 if args.port != None:
     listen_port = args.port
+
 connected = []
 
 async def listen(websocket, path):
@@ -62,7 +62,7 @@ async def listen(websocket, path):
 print("osu! mobile clicker")
 
 try:
-    start_server = websockets.serve(listen, listen_ip, listen_port, max_queue=999, read_limit=999, write_limit=999, ping_interval=1)
+    start_server = websockets.serve(listen, listen_ip, listen_port, max_queue=99999, read_limit=99999, write_limit=99999, ping_interval=0.01)
 
     asyncio.get_event_loop().run_until_complete(start_server)
     print("- Listening at " + "{ip}:{port}".format(ip=listen_ip, port=listen_port))
